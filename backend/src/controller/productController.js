@@ -71,7 +71,7 @@ export const deleteProduct = async (req, res) => {
 export const getAllProduct = async (req, res) => {
   try {
     const allProducts = await Product.find({});
-    if (!allProducts) {
+    if (allProducts.length === 0) {
       return res.status(404).json({ success: false, message: "No Products" });
     }
     res
@@ -79,6 +79,59 @@ export const getAllProduct = async (req, res) => {
       .json({ success: true, message: "Fetched All Products", allProducts });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
+    console.log(error.message);
+  }
+};
+
+export const getSingleProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const product = await Product.findById(id);
+    if (!product) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No product found by the ID" });
+    }
+    res
+      .status(200)
+      .json({ success: true, message: "Product Fetched", product });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Invalid ID format or Server Error",
+      error: error.message,
+    });
+    console.log(error.message);
+  }
+};
+
+export const updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = { ...req.body };
+    if (req.files && req.files.length > 0) {
+      updateData.image = req.files.map((file) => `/uploads/${file.filename}`);
+    }
+    const updatedProduct = await Product.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    });
+    if (!updatedProduct) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No Product found" });
+    }
+    res.status(200).json({
+      success: true,
+      message: "Updated Product",
+      product: updatedProduct,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    });
     console.log(error.message);
   }
 };
