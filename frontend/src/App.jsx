@@ -1,42 +1,92 @@
-import "./App.css";
-import Navbar from "./Components/Navbar/Navbar.jsx";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+
+import UserLayout from "./Layout/UserLayout.jsx";
+import AdminLayout from "./Layout/AdminLayout.jsx";
+
 import Shop from "./Pages/Shop.jsx";
 import ShopCategory from "./Pages/ShopCategory.jsx";
 import Product from "./Pages/Product.jsx";
 import Cart from "./Pages/Cart.jsx";
 import LoginSignup from "./Pages/LoginSignup.jsx";
-import Footer from "./Components/Footer/Footer.jsx";
+
+import AddProduct from "./Components/adminComponents/AddProduct/AddProduct.jsx";
+import ListProduct from "./Components/adminComponents/ListProduct/ListProduct.jsx";
+import EditProduct from "./Components/adminComponents/EditProduct/EditProduct.jsx";
+
 import men_banner from "./assets/banner_mens.png";
 import women_banner from "./assets/banner_women.png";
 import kid_banner from "./assets/banner_kids.png";
 
 function App() {
   return (
-    <div>
-      <Navbar />
+    <>
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: "#FF4141",
+            color: "#fff",
+            fontSize: "14px",
+            fontWeight: "500",
+            borderRadius: "8px",
+            padding: "12px 16px",
+          },
+          success: {
+            style: {
+              background: "#10B981",
+            },
+          },
+          error: {
+            style: {
+              background: "#FF4141",
+            },
+          },
+        }}
+      />
       <Routes>
-        <Route path="/" element={<Shop />} />
-        <Route
-          path="/mens"
-          element={<ShopCategory banner={men_banner} category="men" />}
-        />
-        <Route
-          path="/womens"
-          element={<ShopCategory banner={women_banner} category="women" />}
-        />
-        <Route
-          path="/kids"
-          element={<ShopCategory banner={kid_banner} category="kid" />}
-        />
-        <Route path="/product" element={<Product />}>
-          <Route path=":productId" element={<Product />} />
+        <Route path="cart" element={<Cart />} />
+        <Route path="login" element={<LoginSignup />} />
+
+        {/* ================= USER ROUTES ================= */}
+        <Route path="/" element={<UserLayout />}>
+          <Route index element={<Shop />} />
+
+          <Route
+            path="mens"
+            element={<ShopCategory banner={men_banner} category="men" />}
+          />
+          <Route
+            path="womens"
+            element={<ShopCategory banner={women_banner} category="women" />}
+          />
+          <Route
+            path="kids"
+            element={<ShopCategory banner={kid_banner} category="kid" />}
+          />
+
+          <Route path="product">
+            <Route index element={<Product />} />
+            <Route path=":productId" element={<Product />} />
+          </Route>
         </Route>
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/login" element={<LoginSignup />} />
+
+        {/* ================= ADMIN ROUTES ================= */}
+        <Route path="/admin" element={<AdminLayout />}>
+          {/* Redirect admin base → list-product */}
+          <Route index element={<Navigate to="list-product" replace />} />
+
+          <Route path="add-product" element={<AddProduct />} />
+          <Route path="list-product" element={<ListProduct />} />
+          <Route path="edit-product/:id" element={<EditProduct />} />
+        </Route>
+
+        {/* ================= FALLBACK ================= */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-      <Footer />
-    </div>
+    </>
   );
 }
 
