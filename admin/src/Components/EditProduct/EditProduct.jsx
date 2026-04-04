@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { UploadCloud, X, Plus, ArrowLeft, Save, Trash2 } from 'lucide-react';
+import { X, Plus, ArrowLeft, Save, Trash2 } from 'lucide-react';
 
 const EditProduct = () => {
   const { id } = useParams();
@@ -101,7 +101,6 @@ const EditProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validation
     if (!productDetails.name) {
       alert('Please enter product name');
       return;
@@ -110,10 +109,10 @@ const EditProduct = () => {
       alert('Please upload at least one product image');
       return;
     }
-    if (!productDetails.newPrice) {
-      alert('Please enter new price');
-      return;
-    }
+    // if (!productDetails.newPrice) {
+    //   alert('Please enter new price');
+    //   return;
+    // }
     if (!productDetails.oldPrice) {
       alert('Please enter old price');
       return;
@@ -126,7 +125,6 @@ const EditProduct = () => {
     setSaving(true);
 
     try {
-      // Create FormData for file upload
       const formData = new FormData();
       formData.append('name', productDetails.name);
       formData.append('newPrice', productDetails.newPrice);
@@ -202,7 +200,6 @@ const EditProduct = () => {
   return (
     <form onSubmit={handleSubmit}>
       <div className="bg-white rounded-md shadow-sm border border-gray-100">
-        {/* Header */}
         <div className="p-6 border-b border-gray-200">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="flex items-center gap-4">
@@ -219,7 +216,7 @@ const EditProduct = () => {
               </div>
             </div>
             
-            <div className="flex gap-3">
+            <div className="hidden md:flex gap-3 ">
               <button
                 type="button"
                 onClick={handleDelete}
@@ -240,10 +237,8 @@ const EditProduct = () => {
           </div>
         </div>
 
-        {/* Form Content */}
         <div className="p-6">
           <div className="max-w-4xl mx-auto space-y-6">
-            {/* Product Name */}
             <div className="flex flex-col gap-2">
               <label htmlFor="name" className="text-gray-700 font-medium">
                 Product Name <span className="text-red-500">*</span>
@@ -260,11 +255,10 @@ const EditProduct = () => {
               />
             </div>
 
-            {/* Prices */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="flex flex-col gap-2">
                 <label htmlFor="newPrice" className="text-gray-700 font-medium">
-                  New Price (Sale Price) <span className="text-red-500">*</span>
+                  New Price (Sale Price)
                 </label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
@@ -309,7 +303,6 @@ const EditProduct = () => {
               </div>
             </div>
 
-            {/* Category */}
             <div className="flex flex-col gap-2">
               <label htmlFor="category" className="text-gray-700 font-medium">
                 Product Category <span className="text-red-500">*</span>
@@ -328,7 +321,6 @@ const EditProduct = () => {
               </select>
             </div>
 
-            {/* Availability */}
             <div className="flex flex-col gap-2">
               <label className="text-gray-700 font-medium">Product Status</label>
               <div className="flex items-center gap-4">
@@ -346,7 +338,6 @@ const EditProduct = () => {
               <p className="text-xs text-gray-400">Uncheck to hide product from store</p>
             </div>
 
-            {/* Product Images */}
             <div className="flex flex-col gap-2">
               <label className="text-gray-700 font-medium">
                 Product Images <span className="text-red-500">*</span>
@@ -354,7 +345,6 @@ const EditProduct = () => {
               <p className="text-sm text-gray-500 mb-2">Upload up to 5 images (first image will be primary)</p>
               
               <div className="flex flex-wrap gap-4">
-                {/* Existing Images */}
                 {existingImages.map((imageUrl, index) => (
                   <div key={`existing-${index}`} className="relative group">
                     <div className="w-32 h-32 border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
@@ -410,7 +400,6 @@ const EditProduct = () => {
                   </div>
                 ))}
 
-                {/* Upload Button */}
                 {(existingImages.length + images.length) < 5 && (
                   <label htmlFor="file-input" className="cursor-pointer">
                     <div className="w-32 h-32 border-2 border-dashed border-gray-300 flex flex-col items-center justify-center rounded-lg hover:bg-gray-50 transition-all">
@@ -434,7 +423,6 @@ const EditProduct = () => {
               <p className="text-xs text-gray-400">Supported formats: JPG, PNG, GIF. Max size: 5MB each</p>
             </div>
 
-            {/* Product Info */}
             <div className="bg-gray-50 p-4 rounded-lg">
               <h3 className="text-sm font-medium text-gray-700 mb-2">Product Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">

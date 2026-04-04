@@ -14,12 +14,12 @@ const Sidebar = () => {
     <div className="w-full lg:w-64 bg-white border-r border-gray-200 flex-shrink-0">
       <div className="h-full py-6 px-4">
         <div className="flex flex-col gap-2 sticky top-0">
-          <NavLink to="addproduct" className={navLinkClass}>
+          <NavLink to="add-product" className={navLinkClass}>
             <ShoppingCart size={24} />
             <span>Add Product</span>
           </NavLink>
 
-          <NavLink to="listproduct" className={navLinkClass}>
+          <NavLink to="list-product" className={navLinkClass}>
             <List size={24} />
             <span>Product List</span>
           </NavLink>

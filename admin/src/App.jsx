@@ -8,11 +8,17 @@ import EditProduct from "./Components/EditProduct/EditProduct";
 const App = () => {
   return (
     <Routes>
-      <Route path="/admin" element={<Admin />}>
-        <Route path="addproduct" element={<AddProduct />} />
-        <Route path="listproduct" element={<ListProduct />} />
-        <Route path="editproduct/:id" element={<EditProduct />} />
+      <Route path="/" element={<Admin />}>
+
+        <Route index element={<Navigate to="list-product" replace />} />
+
+        <Route path="add-product" element={<AddProduct />} />
+        <Route path="list-product" element={<ListProduct />} />
+        <Route path="edit-product/:id" element={<EditProduct />} />
+
       </Route>
+
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };

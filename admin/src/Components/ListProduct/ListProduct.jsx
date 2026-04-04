@@ -3,14 +3,12 @@ import { useNavigate } from "react-router-dom";
 import {
   Trash2,
   Edit,
-  Eye,
   Search,
   Filter,
   X,
   ChevronLeft,
   ChevronRight,
   Package,
-  DollarSign,
   Tag,
   Calendar,
 } from "lucide-react";
@@ -21,7 +19,7 @@ const ListProduct = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(12);
+  const [itemsPerPage] = useState(4);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [showFilter, setShowFilter] = useState(false);
   const [availabilityFilter, setAvailabilityFilter] = useState("all");
@@ -169,10 +167,10 @@ const ListProduct = () => {
 
   // Edit product handler
   const handleEdit = (productId) => {
-    navigate(`/admin/editproduct/${productId}`);
+    navigate(`/edit-product/${productId}`);
   };
 
-  // Toggle availability
+  // Toggle availability This need to be completed.
   const handleToggleAvailability = async (productId, currentStatus) => {
     try {
       // Replace with your actual API call
@@ -242,16 +240,6 @@ const ListProduct = () => {
     });
   };
 
-  // Get category badge color
-  const getCategoryBadge = (category) => {
-    const categories = {
-      women: "bg-pink-100 text-pink-800",
-      men: "bg-blue-100 text-blue-800",
-      kid: "bg-green-100 text-green-800",
-    };
-    return categories[category] || "bg-gray-100 text-gray-800";
-  };
-
   // Get category color for gradient
   const getCategoryColor = (category) => {
     const colors = {
@@ -281,7 +269,6 @@ const ListProduct = () => {
   // Get stats
   const totalProducts = products.length;
   const availableProducts = products.filter((p) => p.available).length;
-  const totalValue = products.reduce((sum, p) => sum + p.newPrice, 0);
 
   if (loading) {
     return (
@@ -295,7 +282,6 @@ const ListProduct = () => {
 
   return (
     <div className="bg-white rounded-md shadow-sm border border-gray-100">
-      {/* Header */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
@@ -306,7 +292,6 @@ const ListProduct = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
-            {/* Search Bar */}
             <div className="relative">
               <Search
                 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -324,10 +309,9 @@ const ListProduct = () => {
               />
             </div>
 
-            {/* Filter Button */}
             <button
               onClick={() => setShowFilter(!showFilter)}
-              className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
             >
               <Filter size={18} />
               <span>Filter</span>
@@ -340,7 +324,6 @@ const ListProduct = () => {
           </div>
         </div>
 
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
           <div className="bg-blue-50 rounded-lg p-4">
             <div className="flex items-center justify-between">
@@ -370,14 +353,13 @@ const ListProduct = () => {
           </div>
         </div>
 
-        {/* Filter Panel */}
         {showFilter && (
           <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-medium text-gray-700">Filters</h3>
               <button
                 onClick={clearFilters}
-                className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1 cursor-pointer"
               >
                 <X size={14} /> Clear all
               </button>
@@ -414,7 +396,6 @@ const ListProduct = () => {
         )}
       </div>
 
-      {/* Products Grid - Card Layout */}
       {currentProducts.length > 0 ? (
         <>
           <div className="p-6">
@@ -428,7 +409,6 @@ const ListProduct = () => {
                       : "border-gray-200"
                   }`}
                 >
-                  {/* Product Image */}
                   <div className="relative overflow-hidden bg-gray-100 h-64">
                     <img
                       src={product.image[0]}
@@ -436,7 +416,6 @@ const ListProduct = () => {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
 
-                    {/* Status Badge */}
                     {!product.available && (
                       <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                         <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
@@ -445,14 +424,12 @@ const ListProduct = () => {
                       </div>
                     )}
 
-                    {/* Category Badge */}
                     <div
                       className={`absolute top-3 right-3 bg-gradient-to-r ${getCategoryColor(product.category)} text-white text-xs font-semibold px-3 py-1 rounded-full capitalize shadow-md`}
                     >
                       {product.category}
                     </div>
 
-                    {/* Discount Badge */}
                     {getDiscountPercentage(product.newPrice, product.oldPrice) >
                       0 && (
                       <div className="absolute bottom-3 left-3 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-md">
@@ -465,7 +442,6 @@ const ListProduct = () => {
                       </div>
                     )}
 
-                    {/* Image Count Badge */}
                     {product.image.length > 1 && (
                       <div className="absolute bottom-3 right-3 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded-md">
                         +{product.image.length - 1} more
@@ -473,19 +449,16 @@ const ListProduct = () => {
                     )}
                   </div>
 
-                  {/* Product Info */}
                   <div className="p-4">
                     <h3 className="font-semibold text-gray-800 text-lg mb-1 line-clamp-1">
                       {product.name}
                     </h3>
 
-                    {/* Date */}
                     <div className="flex items-center gap-1 text-xs text-gray-400 mb-2">
                       <Calendar size={12} />
                       <span>Added {formatDate(product.date)}</span>
                     </div>
 
-                    {/* Price Section */}
                     <div className="flex items-baseline gap-2 mb-3">
                       <span className="text-2xl font-bold text-gray-900">
                         {formatPrice(product.newPrice)}
@@ -497,7 +470,6 @@ const ListProduct = () => {
                       )}
                     </div>
 
-                    {/* Availability Toggle */}
                     <div className="flex items-center justify-between mb-4">
                       <span className="text-sm text-gray-500">Status:</span>
                       <button
@@ -521,7 +493,6 @@ const ListProduct = () => {
                       </button>
                     </div>
 
-                    {/* Action Buttons */}
                     <div className="flex gap-2 pt-2 border-t border-gray-100">
                       <button
                         onClick={() => handleEdit(product._id)}
@@ -542,7 +513,6 @@ const ListProduct = () => {
             </div>
           </div>
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between flex-wrap gap-4">
               <div className="text-sm text-gray-500">
@@ -601,7 +571,6 @@ const ListProduct = () => {
           )}
         </>
       ) : (
-        // Empty State
         <div className="text-center py-16">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-4">
             <Package size={32} className="text-gray-400" />
