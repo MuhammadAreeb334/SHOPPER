@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { useParams, useNavigate } from 'react-router-dom';
-import { X, Plus, ArrowLeft, Save, Trash2 } from 'lucide-react';
+import { useParams, useNavigate, data } from "react-router-dom";
+import { X, Plus, ArrowLeft, Save, Trash2 } from "lucide-react";
+import { FireAPI, baseUrl } from "../../../hooks/useRequest";
 
 const EditProduct = () => {
   const { id } = useParams();
@@ -15,65 +16,50 @@ const EditProduct = () => {
     name: "",
     newPrice: "",
     oldPrice: "",
-    category: "women",
-    available: true
+    category: "womens",
+    available: true,
   });
 
-  // Fetch product data on component mount
   useEffect(() => {
     const fetchProduct = async () => {
       setLoading(true);
       try {
-        // Replace with your actual API call
-        // const response = await fetch(`/api/products/${id}`);
-        // const data = await response.json();
-        
-        // Sample data - replace with API response
-        const sampleProduct = {
-          _id: id,
-          name: "Classic White Sneakers",
-          newPrice: 69.99,
-          oldPrice: 89.99,
-          category: "women",
-          available: true,
-          image: [
-            "https://images.unsplash.com/photo-1549298916-b41d501d3772",
-            "https://images.unsplash.com/photo-1560769629-975ec94e6a86",
-            "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa"
-          ],
-          date: "2024-01-15"
-        };
-        
-        setProductDetails({
-          name: sampleProduct.name,
-          newPrice: sampleProduct.newPrice.toString(),
-          oldPrice: sampleProduct.oldPrice.toString(),
-          category: sampleProduct.category,
-          available: sampleProduct.available
-        });
-        
-        setExistingImages(sampleProduct.image);
+        const data = await FireAPI(`api/products/${id}`, "GET");
+        console.log(data);
+        if (data && data.success) {
+          const product = data.product;
+          setProductDetails({
+            name: product.name,
+            newPrice: product.newPrice.toString(),
+            oldPrice: product.oldPrice.toString(),
+            category: product.category,
+            available: product.available,
+          });
+          setExistingImages(product.image || []);
+        } else {
+          toast.error("Failed to fetch product details");
+          navigate("/admin/list-product");
+        }
       } catch (error) {
-        console.error('Error fetching product:', error);
-        toast.error('Error fetching product details');
+        console.error("Error fetching product:", error);
+        toast.error("Error fetching product details");
+        navigate("/admin/list-product");
       } finally {
         setLoading(false);
       }
     };
-
     fetchProduct();
-  }, [id]);
+  }, [id, navigate]);
 
   const imageHandler = (e) => {
     const files = Array.from(e.target.files);
-    
+
     if (files.length > 0) {
       const totalImages = existingImages.length + images.length + files.length;
       if (totalImages > 5) {
-        toast.error('Maximum 5 images allowed');
+        toast.error("Maximum 5 images allowed");
         return;
       }
-      
       // Add new images
       const newImages = [...images, ...files];
       setImages(newImages);
@@ -83,7 +69,9 @@ const EditProduct = () => {
   const removeExistingImage = (indexToRemove) => {
     const removedImage = existingImages[indexToRemove];
     setRemovedImages([...removedImages, removedImage]);
-    setExistingImages(existingImages.filter((_, index) => index !== indexToRemove));
+    setExistingImages(
+      existingImages.filter((_, index) => index !== indexToRemove),
+    );
   };
 
   const removeNewImage = (indexToRemove) => {
@@ -95,31 +83,27 @@ const EditProduct = () => {
     const { name, value, type, checked } = e.target;
     setProductDetails({
       ...productDetails,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!productDetails.name) {
-      toast.error('Please enter product name');
+      toast.error("Please enter product name");
       return;
     }
     if (existingImages.length === 0 && images.length === 0) {
-      toast.error('Please upload at least one product image');
+      toast.error("Please upload at least one product image");
       return;
     }
-    // if (!productDetails.newPrice) {
-    //   toast.error('Please enter new price');
-    //   return;
-    // }
     if (!productDetails.oldPrice) {
-      toast.error('Please enter old price');
+      toast.error("Please enter old price");
       return;
     }
     if (!productDetails.category) {
-      toast.error('Please select a category');
+      toast.error("Please select a category");
       return;
     }
 
@@ -127,63 +111,52 @@ const EditProduct = () => {
 
     try {
       const formData = new FormData();
-      formData.append('name', productDetails.name);
-      formData.append('newPrice', productDetails.newPrice);
-      formData.append('oldPrice', productDetails.oldPrice);
-      formData.append('category', productDetails.category);
-      formData.append('available', productDetails.available);
-      
-      // Append existing images that remain
-      formData.append('existingImages', JSON.stringify(existingImages));
-      
-      // Append removed images
-      formData.append('removedImages', JSON.stringify(removedImages));
-      
-      // Append new images
+      formData.append("name", productDetails.name);
+      formData.append("newPrice", productDetails.newPrice);
+      formData.append("oldPrice", productDetails.oldPrice);
+      formData.append("category", productDetails.category);
+      formData.append("available", productDetails.available);
+      formData.append("existingImages", JSON.stringify(existingImages));
+      formData.append("removedImages", JSON.stringify(removedImages));
+
       images.forEach((image, index) => {
-        formData.append('images', image);
+        formData.append("images", image);
       });
 
-      // Replace with your actual API call
-      // const response = await fetch(`/api/products/${id}`, {
-      //   method: 'PUT',
-      //   body: formData
-      // });
-      
-      // if (!response.ok) throw new Error('Failed to update product');
-      
-      console.log('Product Updated:', {
+      const response = await FireAPI(`api/products/${id}`, "PATCH", formData);
+      if (response.success) {
+        toast.success("Product Updated Successfully!");
+        navigate("/admin/list-product");
+      }
+
+      console.log("Product Updated:", {
         id,
         ...productDetails,
         existingImages,
-        newImages: images.map(img => img.name),
-        removedImages
+        newImages: images.map((img) => img.name),
+        removedImages,
       });
-      
-      toast.success('Product updated successfully!');
-      navigate('/admin/listproduct');
-      
     } catch (error) {
-      console.error('Error updating product:', error);
-      toast.error('Error updating product. Please try again.');
+      console.error("Error updating product:", error);
+      toast.error("Error updating product. Please try again.");
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async () => {
-    if (window.confirm('Are you sure you want to delete this product permanently?')) {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this product permanently?",
+      )
+    ) {
       try {
-        // Replace with your actual API call
-        // const response = await fetch(`/api/products/${id}`, {
-        //   method: 'DELETE'
-        // });
-        
-        toast.success('Product deleted successfully!');
-        navigate('/admin/listproduct');
+        const response = await FireAPI(`api/products/${id}`, "DELETE");
+        toast.success("Product deleted successfully!");
+        navigate("/admin/list-product");
       } catch (error) {
-        console.error('Error deleting product:', error);
-        toast.error('Error deleting product. Please try again.');
+        console.error("Error deleting product:", error);
+        toast.error("Error deleting product. Please try again.");
       }
     }
   };
@@ -206,17 +179,19 @@ const EditProduct = () => {
             <div className="flex items-center gap-4">
               <button
                 type="button"
-                onClick={() => navigate('/admin/list- product')}
+                onClick={() => navigate("/admin/list-product")}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <ArrowLeft size={20} className="text-gray-600" />
               </button>
               <div>
-                <h2 className="text-2xl font-semibold text-gray-800">Edit Product</h2>
+                <h2 className="text-2xl font-semibold text-gray-800">
+                  Edit Product
+                </h2>
                 <p className="text-gray-500 mt-1">Update product information</p>
               </div>
             </div>
-            
+
             <div className="hidden md:flex gap-3 ">
               <button
                 type="button"
@@ -232,7 +207,7 @@ const EditProduct = () => {
                 className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save size={18} />
-                {saving ? 'Saving...' : 'Save Changes'}
+                {saving ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </div>
@@ -262,7 +237,9 @@ const EditProduct = () => {
                   New Price (Sale Price)
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                    $
+                  </span>
                   <input
                     id="newPrice"
                     value={productDetails.newPrice}
@@ -277,13 +254,16 @@ const EditProduct = () => {
                 </div>
                 <p className="text-xs text-gray-400">Current selling price</p>
               </div>
-              
+
               <div className="flex flex-col gap-2">
                 <label htmlFor="oldPrice" className="text-gray-700 font-medium">
-                  Old Price (Original Price) <span className="text-red-500">*</span>
+                  Old Price (Original Price){" "}
+                  <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                    $
+                  </span>
                   <input
                     id="oldPrice"
                     value={productDetails.oldPrice}
@@ -298,7 +278,13 @@ const EditProduct = () => {
                 </div>
                 {productDetails.oldPrice && productDetails.newPrice && (
                   <p className="text-xs text-green-600">
-                    Discount: {Math.round(((productDetails.oldPrice - productDetails.newPrice) / productDetails.oldPrice) * 100)}% off
+                    Discount:{" "}
+                    {Math.round(
+                      ((productDetails.oldPrice - productDetails.newPrice) /
+                        productDetails.oldPrice) *
+                        100,
+                    )}
+                    % off
                   </p>
                 )}
               </div>
@@ -316,14 +302,16 @@ const EditProduct = () => {
                 className="w-full md:w-64 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                 required
               >
-                <option value="women">Women</option>
-                <option value="men">Men</option>
-                <option value="kid">Kids</option>
+                <option value="womens">Women's</option>
+                <option value="mens">Men's</option>
+                <option value="kids">Kid's</option>
               </select>
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-gray-700 font-medium">Product Status</label>
+              <label className="text-gray-700 font-medium">
+                Product Status
+              </label>
               <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -336,21 +324,25 @@ const EditProduct = () => {
                   <span className="text-gray-600">Available for sale</span>
                 </label>
               </div>
-              <p className="text-xs text-gray-400">Uncheck to hide product from store</p>
+              <p className="text-xs text-gray-400">
+                Uncheck to hide product from store
+              </p>
             </div>
 
             <div className="flex flex-col gap-2">
               <label className="text-gray-700 font-medium">
                 Product Images <span className="text-red-500">*</span>
               </label>
-              <p className="text-sm text-gray-500 mb-2">Upload up to 5 images (first image will be primary)</p>
-              
+              <p className="text-sm text-gray-500 mb-2">
+                Upload up to 5 images (first image will be primary)
+              </p>
+
               <div className="flex flex-wrap gap-4">
                 {existingImages.map((imageUrl, index) => (
                   <div key={`existing-${index}`} className="relative group">
                     <div className="w-32 h-32 border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
                       <img
-                        src={imageUrl}
+                        src={`${baseUrl}${imageUrl}`}
                         alt={`Existing product ${index + 1}`}
                         className="w-full h-full object-cover"
                       />
@@ -401,17 +393,19 @@ const EditProduct = () => {
                   </div>
                 ))}
 
-                {(existingImages.length + images.length) < 5 && (
+                {existingImages.length + images.length < 5 && (
                   <label htmlFor="file-input" className="cursor-pointer">
                     <div className="w-32 h-32 border-2 border-dashed border-gray-300 flex flex-col items-center justify-center rounded-lg hover:bg-gray-50 transition-all">
                       <Plus className="text-gray-400" size={32} />
                       <p className="text-xs text-gray-400 mt-1">Add Image</p>
-                      <p className="text-xs text-gray-400">{existingImages.length + images.length}/5</p>
+                      <p className="text-xs text-gray-400">
+                        {existingImages.length + images.length}/5
+                      </p>
                     </div>
                   </label>
                 )}
               </div>
-              
+
               <input
                 onChange={imageHandler}
                 type="file"
@@ -421,11 +415,15 @@ const EditProduct = () => {
                 multiple
                 hidden
               />
-              <p className="text-xs text-gray-400">Supported formats: JPG, PNG, GIF. Max size: 5MB each</p>
+              <p className="text-xs text-gray-400">
+                Supported formats: JPG, PNG, GIF. Max size: 5MB each
+              </p>
             </div>
 
             <div className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="text-sm font-medium text-gray-700 mb-2">Product Information</h3>
+              <h3 className="text-sm font-medium text-gray-700 mb-2">
+                Product Information
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                 <div>
                   <span className="text-gray-500">Product ID:</span>
@@ -433,7 +431,9 @@ const EditProduct = () => {
                 </div>
                 <div>
                   <span className="text-gray-500">Total Images:</span>
-                  <p className="text-gray-700">{existingImages.length + images.length} / 5</p>
+                  <p className="text-gray-700">
+                    {existingImages.length + images.length} / 5
+                  </p>
                 </div>
               </div>
             </div>
@@ -454,7 +454,7 @@ const EditProduct = () => {
                 className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50"
               >
                 <Save size={18} />
-                {saving ? 'Saving...' : 'Save Changes'}
+                {saving ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </div>

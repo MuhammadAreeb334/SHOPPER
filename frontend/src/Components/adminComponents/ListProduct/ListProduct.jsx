@@ -13,6 +13,8 @@ import {
   Tag,
   Calendar,
 } from "lucide-react";
+import { FireAPI } from "../../../hooks/useRequest.js";
+import { baseUrl } from "../../../hooks/useRequest.js";
 
 const ListProduct = () => {
   const navigate = useNavigate();
@@ -20,124 +22,22 @@ const ListProduct = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(4);
+  const [itemsPerPage] = useState(12);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [showFilter, setShowFilter] = useState(false);
   const [availabilityFilter, setAvailabilityFilter] = useState("all");
 
-  // Fetch products from API
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        // Replace with your actual API call
-        // const response = await fetch('/api/products');
-        // const data = await response.json();
-
-        // Sample data matching the schema
-        const sampleData = [
-          {
-            _id: "1",
-            name: "Classic White Sneakers",
-            newPrice: 69.99,
-            oldPrice: 89.99,
-            category: "women",
-            available: true,
-            image: [
-              "https://images.unsplash.com/photo-1549298916-b41d501d3772",
-              "https://images.unsplash.com/photo-1560769629-975ec94e6a86",
-            ],
-            date: "2024-01-15T10:30:00Z",
-          },
-          {
-            _id: "2",
-            name: "Leather Crossbody Bag",
-            newPrice: 99.99,
-            oldPrice: 129.99,
-            category: "women",
-            available: true,
-            image: [
-              "https://images.unsplash.com/photo-1548036328-c9fa89d128fa",
-              "https://images.unsplash.com/photo-1591561954555-607968c4ab5f",
-            ],
-            date: "2024-01-20T14:45:00Z",
-          },
-          {
-            _id: "3",
-            name: "Men's Denim Jacket",
-            newPrice: 79.99,
-            oldPrice: 79.99,
-            category: "men",
-            available: true,
-            image: [
-              "https://images.unsplash.com/photo-1576995853123-5a10305d93c0",
-            ],
-            date: "2024-01-18T09:15:00Z",
-          },
-          {
-            _id: "4",
-            name: "Kids Cotton T-Shirt",
-            newPrice: 19.99,
-            oldPrice: 24.99,
-            category: "kid",
-            available: false,
-            image: [
-              "https://images.unsplash.com/photo-1519238263530-99bdd11df2ea",
-            ],
-            date: "2024-01-22T16:20:00Z",
-          },
-          {
-            _id: "5",
-            name: "Silver Watch",
-            newPrice: 149.99,
-            oldPrice: 199.99,
-            category: "men",
-            available: true,
-            image: [
-              "https://images.unsplash.com/photo-1524805444758-089113d48a6d",
-              "https://images.unsplash.com/photo-1509048191080-d2984bee6f31",
-            ],
-            date: "2024-01-10T11:00:00Z",
-          },
-          {
-            _id: "6",
-            name: "Floral Summer Dress",
-            newPrice: 44.99,
-            oldPrice: 59.99,
-            category: "women",
-            available: true,
-            image: [
-              "https://images.unsplash.com/photo-1496747611176-843222e1e57c",
-            ],
-            date: "2024-01-25T13:30:00Z",
-          },
-          {
-            _id: "7",
-            name: "Sports Running Shoes",
-            newPrice: 119.99,
-            oldPrice: 149.99,
-            category: "men",
-            available: true,
-            image: [
-              "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
-            ],
-            date: "2024-01-28T10:00:00Z",
-          },
-          {
-            _id: "8",
-            name: "Kids Backpack",
-            newPrice: 29.99,
-            oldPrice: 34.99,
-            category: "kid",
-            available: true,
-            image: [
-              "https://images.unsplash.com/photo-1553062407-98eeb64c6a62",
-            ],
-            date: "2024-01-30T15:45:00Z",
-          },
-        ];
-
-        setProducts(sampleData);
+        const data = await FireAPI(`api/products`, "GET");
+        if (data && data.success) {
+          setProducts(data.allProducts);
+        } else {
+          toast.error("Failed to fetch Product");
+        }
+        console.log(data);
       } catch (error) {
         console.error("Error fetching products:", error);
         toast.error("Error loading products");
@@ -149,16 +49,12 @@ const ListProduct = () => {
     fetchProducts();
   }, []);
 
-  // Delete product handler
   const handleDelete = async (productId, productName) => {
     if (window.confirm(`Are you sure you want to delete "${productName}"?`)) {
       try {
-        // Replace with your actual API call
-        // await fetch(`/api/products/${productId}`, { method: 'DELETE' });
-
-        // Update local state
+        await FireAPI(`api/products/${productId}`, "DELETE");
         setProducts(products.filter((product) => product._id !== productId));
-        toast.success("Product deleted successfully!");
+        toast.success(`${productName} deleted successfully!`);
       } catch (error) {
         console.error("Error deleting product:", error);
         toast.error("Error deleting product. Please try again.");
@@ -166,34 +62,33 @@ const ListProduct = () => {
     }
   };
 
-  // Edit product handler
   const handleEdit = (productId) => {
     navigate(`/admin/edit-product/${productId}`);
   };
 
   // Toggle availability This need to be completed.
-  const handleToggleAvailability = async (productId, currentStatus) => {
-    try {
-      // Replace with your actual API call
-      // await fetch(`/api/products/${productId}/toggle-availability`, {
-      //   method: 'PATCH',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ available: !currentStatus })
-      // });
+  // const handleToggleAvailability = async (productId, currentStatus) => {
+  //   try {
+  //     // Replace with your actual API call
+  //     // await fetch(`/api/products/${productId}/toggle-availability`, {
+  //     //   method: 'PATCH',
+  //     //   headers: { 'Content-Type': 'application/json' },
+  //     //   body: JSON.stringify({ available: !currentStatus })
+  //     // });
 
-      // Update local state
-      setProducts(
-        products.map((product) =>
-          product._id === productId
-            ? { ...product, available: !currentStatus }
-            : product,
-        ),
-      );
-    } catch (error) {
-      console.error("Error toggling availability:", error);
-      toast.error("Error updating product status");
-    }
-  };
+  //     // Update local state
+  //     setProducts(
+  //       products.map((product) =>
+  //         product._id === productId
+  //           ? { ...product, available: !currentStatus }
+  //           : product,
+  //       ),
+  //     );
+  //   } catch (error) {
+  //     console.error("Error toggling availability:", error);
+  //     toast.error("Error updating product status");
+  //   }
+  // };
 
   // Filter products
   const filteredProducts = products.filter((product) => {
@@ -375,12 +270,12 @@ const ListProduct = () => {
                 className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
               >
                 <option value="all">All Categories</option>
-                <option value="women">Women</option>
-                <option value="men">Men</option>
-                <option value="kid">Kids</option>
+                <option value="womens">Women</option>
+                <option value="mens">Men</option>
+                <option value="kids">Kids</option>
               </select>
 
-              <select
+              {/* <select
                 value={availabilityFilter}
                 onChange={(e) => {
                   setAvailabilityFilter(e.target.value);
@@ -391,7 +286,7 @@ const ListProduct = () => {
                 <option value="all">All Status</option>
                 <option value="available">Available</option>
                 <option value="unavailable">Unavailable</option>
-              </select>
+              </select> */}
             </div>
           </div>
         )}
@@ -412,7 +307,7 @@ const ListProduct = () => {
                 >
                   <div className="relative overflow-hidden bg-gray-100 h-64">
                     <img
-                      src={product.image[0]}
+                      src={`${baseUrl}${product.image?.[0]}`}
                       alt={product.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
@@ -471,7 +366,7 @@ const ListProduct = () => {
                       )}
                     </div>
 
-                    <div className="flex items-center justify-between mb-4">
+                    {/* <div className="flex items-center justify-between mb-4">
                       <span className="text-sm text-gray-500">Status:</span>
                       <button
                         onClick={() =>
@@ -492,7 +387,7 @@ const ListProduct = () => {
                           }`}
                         />
                       </button>
-                    </div>
+                    </div> */}
 
                     <div className="flex gap-2 pt-2 border-t border-gray-100">
                       <button

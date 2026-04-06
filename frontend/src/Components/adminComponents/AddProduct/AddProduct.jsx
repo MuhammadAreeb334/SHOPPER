@@ -1,18 +1,21 @@
 import { useState } from "react";
 import { X, Plus } from "lucide-react";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import { FireAPI } from "../../../hooks/useRequest";
 
 const AddProduct = () => {
+  const navigate = useNavigate();
   const [images, setImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [productDetails, setProductDetails] = useState({
     name: "",
     newPrice: "",
     oldPrice: "",
-    category: "women",
+    category: "womens",
     available: true,
   });
-  const [loading, setLoading] = useState(false);
 
   const imageHandler = (e) => {
     const files = Array.from(e.target.files);
@@ -55,10 +58,6 @@ const AddProduct = () => {
       toast.error("Please upload at least one product image");
       return;
     }
-    // if (!productDetails.newPrice) {
-    //   toast.error('Please enter product price');
-    //   return;
-    // }
     if (!productDetails.oldPrice) {
       toast.error("Please enter original price");
       return;
@@ -71,48 +70,33 @@ const AddProduct = () => {
     setLoading(true);
 
     try {
-      // Create FormData for file upload
       const formData = new FormData();
       formData.append("name", productDetails.name);
       formData.append("newPrice", productDetails.newPrice);
       formData.append("oldPrice", productDetails.oldPrice);
       formData.append("category", productDetails.category);
       formData.append("available", productDetails.available);
-
-      // Append multiple images
       images.forEach((image) => {
         formData.append("images", image);
       });
 
-      // Replace with your actual API endpoint
-      // const response = await fetch('/api/products', {
-      //   method: 'POST',
-      //   body: formData
-      // });
-
-      // if (!response.ok) throw new Error('Failed to add product');
-      // const data = await response.json();
-
-      console.log("Product Details:", {
-        ...productDetails,
-        images: images.map((img) => img.name),
-      });
-
-      toast.success("Product added successfully!");
-
-      // Reset form
-      setProductDetails({
-        name: "",
-        newPrice: "",
-        oldPrice: "",
-        category: "women",
-        available: true,
-      });
-
-      // Clear images
-      imagePreviews.forEach((preview) => URL.revokeObjectURL(preview));
-      setImages([]);
-      setImagePreviews([]);
+      const response = await FireAPI("api/products", "POST", formData);
+      if (response.success) {
+        toast.success("Product added successfully!");
+        setProductDetails({
+          name: "",
+          newPrice: "",
+          oldPrice: "",
+          category: "womens",
+          available: true,
+        });
+        imagePreviews.forEach((preview) => URL.revokeObjectURL(preview));
+        setImages([]);
+        setImagePreviews([]);
+        setTimeout(() => {
+          navigate("/admin/list-product");
+        });
+      }
     } catch (error) {
       console.error("Error adding product:", error);
       toast.error("Error adding product. Please try again.");
@@ -221,9 +205,9 @@ const AddProduct = () => {
               className="w-full md:w-64 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
               required
             >
-              <option value="women">Women</option>
-              <option value="men">Men</option>
-              <option value="kid">Kids</option>
+              <option value="womens">Women's</option>
+              <option value="mens">Men's</option>
+              <option value="kids">Kid's</option>
             </select>
           </div>
 
@@ -311,26 +295,6 @@ const AddProduct = () => {
               className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-10 rounded-lg transition-colors shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Adding Product..." : "Add Product"}
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setProductDetails({
-                  name: "",
-                  newPrice: "",
-                  oldPrice: "",
-                  category: "women",
-                  available: true,
-                });
-                imagePreviews.forEach((preview) =>
-                  URL.revokeObjectURL(preview),
-                );
-                setImages([]);
-                setImagePreviews([]);
-              }}
-              className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-lg transition-colors"
-            >
-              Reset
             </button>
           </div>
         </div>
