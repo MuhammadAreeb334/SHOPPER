@@ -108,30 +108,48 @@ export const getSingleProduct = async (req, res) => {
 export const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log("Incoming Body:", req.body);
     const updateData = { ...req.body };
-    if (req.files && req.files.length > 0) {
-      updateData.image = req.files.map((file) => `/uploads/${file.filename}`);
+    let finalImages = [];
+
+    if (req.body.existingImages) {
+      finalImages = JSON.parse(req.body.existingImages);
     }
+
+    if (req.files && req.files.length > 0) {
+      const newImagePaths = req.files.map(
+        (file) => `/uploads/${file.filename}`,
+      );
+      finalImages = [...finalImages, ...newImagePaths];
+    }
+
+    updateData.image = finalImages;
+
+    delete updateData.existingImages;
+    delete updateData.removedImages;
+
     const updatedProduct = await Product.findByIdAndUpdate(id, updateData, {
       new: true,
       runValidators: true,
     });
+
     if (!updatedProduct) {
       return res
         .status(404)
         .json({ success: false, message: "No Product found" });
     }
+
     res.status(200).json({
       success: true,
       message: "Updated Product",
       product: updatedProduct,
     });
   } catch (error) {
+    console.error("Update Error:", error.message);
     res.status(500).json({
       success: false,
       message: "Internal Server Error",
       error: error.message,
     });
-    console.log(error.message);
   }
 };
