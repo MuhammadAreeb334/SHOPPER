@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
+import ScrollToTop from "./Components/ScrollToTop/ScrollToTop.jsx"
 
 import UserLayout from "./Layout/UserLayout.jsx";
 import AdminLayout from "./Layout/AdminLayout.jsx";
@@ -19,6 +20,7 @@ import women_banner from "./assets/banner_women.png";
 import kid_banner from "./assets/banner_kids.png";
 
 function App() {
+  
   return (
     <>
       <Toaster
@@ -46,6 +48,7 @@ function App() {
           },
         }}
       />
+      <ScrollToTop />
       <Routes>
         <Route path="cart" element={<Cart />} />
         <Route path="login" element={<LoginSignup />} />

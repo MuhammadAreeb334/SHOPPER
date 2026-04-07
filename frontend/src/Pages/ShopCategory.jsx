@@ -1,11 +1,25 @@
 import React, { useContext } from "react";
 import "./CSS/ShopCategory.css";
 import { ShopContext } from "../Context/ShopContext";
-import { FaChevronDown } from "react-icons/fa";
 import Items from "../Components/Items/Items";
 
 const ShopCategory = (props) => {
-  const { all_product } = useContext(ShopContext);
+  const { products, loading } = useContext(ShopContext);
+
+  const filteredProducts = products.filter(
+    (items) => props.category === items.category,
+  );
+
+  if (loading) {
+    return (
+      <div className="shop-category">
+        <img className="shopcategory-banner" src={props.banner} alt="" />
+        <div className="flex justify-center items-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="shop-category">
@@ -13,15 +27,12 @@ const ShopCategory = (props) => {
 
       <div className="shopcategory-indexsort">
         <p>
-          <span>Showing 1-12</span> out of 36 products
+          <span>Showing 1-{filteredProducts.length}</span> out of{" "}
+          {filteredProducts.length} products
         </p>
-
-        <div className="shopcategory-sort">
-          Sort by <FaChevronDown className="dropdown-icon" />
-        </div>
       </div>
       <div className="shopcategory-products">
-        {all_product.map((items, key) => {
+        {filteredProducts.map((items, key) => {
           if (props.category === items.category) {
             return (
               <Items
@@ -33,12 +44,12 @@ const ShopCategory = (props) => {
                 old_price={items.old_price}
               />
             );
-          } else {
-            return null;
           }
         })}
+        {filteredProducts.length > 12 && (
+          <div className="shopcategory-loadmore">Explore more</div>
+        )}
       </div>
-      <div className="shopcategory-loadmore">Explore more</div>
     </div>
   );
 };

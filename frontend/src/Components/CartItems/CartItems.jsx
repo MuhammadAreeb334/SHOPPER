@@ -5,7 +5,7 @@ import { FaTrash } from "react-icons/fa";
 
 const CartItems = () => {
   const {
-    all_product,
+    products,
     cartItems,
     addToCart,
     removeFromCart,
@@ -24,7 +24,7 @@ const CartItems = () => {
       </div>
       <hr />
 
-      {all_product.map((item) => {
+      {products.map((item) => {
         if (cartItems[item.id] > 0) {
           return (
             <div className="cart-items-format" key={item.id}>
