@@ -152,7 +152,6 @@ const AddProduct = () => {
                   step="0.01"
                   placeholder="0.00"
                   className="w-full pl-8 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
                 />
               </div>
               <p className="text-xs text-gray-400">Current selling price</p>

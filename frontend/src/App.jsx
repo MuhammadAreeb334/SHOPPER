@@ -75,9 +75,7 @@ function App() {
 
         {/* ================= ADMIN ROUTES ================= */}
         <Route path="/admin" element={<AdminLayout />}>
-          {/* Redirect admin base → list-product */}
           <Route index element={<Navigate to="list-product" replace />} />
-
           <Route path="add-product" element={<AddProduct />} />
           <Route path="list-product" element={<ListProduct />} />
           <Route path="edit-product/:id" element={<EditProduct />} />
