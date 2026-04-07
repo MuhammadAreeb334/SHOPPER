@@ -4,7 +4,7 @@ import Product from "../model/Product.js";
 //   try {
 //     const files = req.files;
 
-//     if (!files || files.lenght === 0) {
+//     if (!files || files.length === 0) {
 //       return res
 //         .status(400)
 //         .json({ success: false, message: "Images are required" });
