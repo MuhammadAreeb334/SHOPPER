@@ -7,6 +7,23 @@ const ShopContextProvider = (props) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [cartItems, setCartItems] = useState({});
+  const [token, setToken] = useState(localStorage.getItem("token") || "");
+  const [user, setUser] = useState(
+    JSON.parse(localStorage.getItem("user")) || null,
+  );
+  const updateToken = (newToken, userData = null) => {
+    if (newToken) {
+      localStorage.setItem("token", newToken);
+      localStorage.setItem("user", JSON.stringify(userData));
+      setToken(newToken);
+      setUser(userData);
+    } else {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      setToken("");
+      setUser(null);
+    }
+  };
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -15,9 +32,9 @@ const ShopContextProvider = (props) => {
       console.log("Fetched products:", data.allProducts);
 
       if (data && data.success) {
-        const productsData = data.allProducts
+        const productsData = data.allProducts;
         const formattedProducts = productsData.map((product) => ({
-          id: product._id, 
+          id: product._id,
           name: product.name,
           image: `${baseUrl}${product.image?.[0] || ""}`,
           new_price: product.newPrice,
@@ -66,9 +83,7 @@ const ShopContextProvider = (props) => {
     let totalAmount = 0;
     for (const itemId in cartItems) {
       if (cartItems[itemId] > 0) {
-        const itemInfo = products.find(
-          (product) => product.id === itemId
-        );
+        const itemInfo = products.find((product) => product.id === itemId);
         if (itemInfo) {
           totalAmount += itemInfo.new_price * cartItems[itemId];
         }
@@ -88,6 +103,9 @@ const ShopContextProvider = (props) => {
   };
 
   const contextValue = {
+    token,
+    user,
+    updateToken,
     products,
     cartItems,
     addToCart,

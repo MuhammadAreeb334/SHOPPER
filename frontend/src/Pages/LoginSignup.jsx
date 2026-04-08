@@ -1,18 +1,25 @@
 import React, { useState } from "react";
+import toast from "react-hot-toast";
 import { Eye, EyeOff } from "lucide-react";
+import { FireAPI } from "../hooks/useRequest";
+import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { ShopContext } from "../Context/ShopContext";
 
 const LoginSignup = () => {
-  const [isLogin, setIsLogin] = useState(false);
+  const { updateToken } = useContext(ShopContext);
+  const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
-  const [agreeTerms, setAgreeTerms] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -57,25 +64,42 @@ const LoginSignup = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) {
       return;
     }
+    setLoading(true);
 
-    console.log(isLogin ? "Login Data:" : "Signup Data:", {
-      name: formData.name,
+    const endPoint = isLogin ? "api/auth/login" : "api/auth/register";
+
+    const payload = {
       email: formData.email,
       password: formData.password,
-    });
-    // Add authentication logic here
+      ...(!isLogin && { name: formData.name }),
+    };
+    try {
+      const response = await FireAPI(endPoint, "POST", payload);
+      console.log("Auth Success: ", response);
+      updateToken(response.token, response.user);
+      toast.success(isLogin ? "Logged in successfully" : "Account created");
+      if (response.user.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
+      // localStorage.setItem("user", JSON.stringify(response.user));
+    } catch (error) {
+      console.log(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleGoogleSignIn = () => {
-    console.log("Google Sign In");
-    // Add Google OAuth logic here
-  };
+  // const handleGoogleSignIn = () => {
+  //   console.log("Google Sign In");
+  //   // Add Google OAuth logic here
+  // };
 
   const toggleMode = () => {
     setIsLogin(!isLogin);
@@ -85,7 +109,6 @@ const LoginSignup = () => {
       password: "",
       confirmPassword: "",
     });
-    setAgreeTerms(false);
     setErrors({});
     setShowPassword(false);
     setShowConfirmPassword(false);
@@ -221,7 +244,7 @@ const LoginSignup = () => {
         </div>
 
         <button
-          onClick={handleGoogleSignIn}
+          // onClick={handleGoogleSignIn}
           className="w-full flex items-center justify-center gap-3 py-3 border border-gray-300 rounded-full bg-white text-gray-700 font-medium transition-all duration-300 hover:bg-gray-50 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">

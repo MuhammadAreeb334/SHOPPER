@@ -1,9 +1,14 @@
-import React from "react";
-import { Outlet } from "react-router-dom";
+import React, { useContext } from "react";
+import { Navigate, Outlet } from "react-router-dom";
+import { ShopContext } from "../Context/ShopContext.jsx";
 import Navbar from "../Components/adminComponents/Navbar/Navbar.jsx";
 import Sidebar from "../Components/adminComponents/Sidebar/Sidebar.jsx";
 
-const Admin = () => {
+const AdminLayout = () => {
+  const { token, user } = useContext(ShopContext);
+  if (!token && user?.role !== "admin") {
+    return <Navigate to="/login" />;
+  }
   return (
     <div className="h-screen flex flex-col lg:overflow-hidden">
       <Navbar />
@@ -17,4 +22,4 @@ const Admin = () => {
   );
 };
 
-export default Admin;
+export default AdminLayout;

@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { connectDB } from "./src/config/db.js";
 import productRouter from "./src/route/productRoutes.js";
 import authRouter from "./src/route/authRoutes.js";
+import { seedAdmin } from "./src/seedAdmin.js";
 
 dotenv.config();
 const app = express();
@@ -22,6 +23,7 @@ const PORT = process.env.PORT || 4000;
 const startServer = async () => {
   try {
     await connectDB();
+    await seedAdmin();
     app.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
     });
