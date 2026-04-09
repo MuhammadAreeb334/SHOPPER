@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import ScrollToTop from "./Components/ScrollToTop/ScrollToTop.jsx"
+import ScrollToTop from "./Components/ScrollToTop/ScrollToTop.jsx";
 
 import UserLayout from "./Layout/UserLayout.jsx";
 import AdminLayout from "./Layout/AdminLayout.jsx";
@@ -14,13 +14,13 @@ import LoginSignup from "./Pages/LoginSignup.jsx";
 import AddProduct from "./Components/adminComponents/AddProduct/AddProduct.jsx";
 import ListProduct from "./Components/adminComponents/ListProduct/ListProduct.jsx";
 import EditProduct from "./Components/adminComponents/EditProduct/EditProduct.jsx";
+import GuestRoute from "./Components/GuestRoute/GuestRoute.jsx";
 
 import men_banner from "./assets/banner_mens.png";
 import women_banner from "./assets/banner_women.png";
 import kid_banner from "./assets/banner_kids.png";
 
 function App() {
-  
   return (
     <>
       <Toaster
@@ -51,7 +51,14 @@ function App() {
       <ScrollToTop />
       <Routes>
         <Route path="cart" element={<Cart />} />
-        <Route path="login" element={<LoginSignup />} />
+        <Route
+          path="login"
+          element={
+            <GuestRoute>
+              <LoginSignup />
+            </GuestRoute>
+          }
+        />
 
         {/* ================= USER ROUTES ================= */}
         <Route path="/" element={<UserLayout />}>

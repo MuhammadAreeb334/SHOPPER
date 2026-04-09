@@ -6,8 +6,11 @@ import Sidebar from "../Components/adminComponents/Sidebar/Sidebar.jsx";
 
 const AdminLayout = () => {
   const { token, user } = useContext(ShopContext);
-  if (!token && user?.role !== "admin") {
+  if (!token || !user) {
     return <Navigate to="/login" />;
+  }
+  if (user.role !== "admin") {
+    return <Navigate to="/" />;
   }
   return (
     <div className="h-screen flex flex-col lg:overflow-hidden">
