@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { connectDB } from "./src/config/db.js";
 import productRouter from "./src/route/productRoutes.js";
 import authRouter from "./src/route/authRoutes.js";
+import cartRoutes from "./src/route/cartRoutes.js";
 import { seedAdmin } from "./src/seedAdmin.js";
 
 dotenv.config();
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use("/uploads", express.static("src/uploads"));
 app.use("/api/products", productRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/cart", cartRoutes);
 
 app.get("/", (req, res) => {
   res.status(200).json({ success: true, message: "Shopper is runnung...." });
