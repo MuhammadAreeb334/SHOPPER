@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
 import { FireAPI, baseUrl } from "../hooks/useRequest";
+import toast from "react-hot-toast";
 
 export const ShopContext = createContext(null);
 
@@ -43,13 +44,8 @@ const ShopContextProvider = (props) => {
           available: product.available,
           images: product.image || [],
         }));
-
         setProducts(formattedProducts);
-
         const initialCart = {};
-        formattedProducts.forEach((product) => {
-          initialCart[product.id] = 0;
-        });
         setCartItems(initialCart);
       } else {
         console.error("Failed to fetch products");
@@ -65,20 +61,54 @@ const ShopContextProvider = (props) => {
     fetchProducts();
   }, []);
 
-  const addToCart = (itemId) => {
-    setCartItems((prev) => ({ ...prev, [itemId]: (prev[itemId] || 0) + 1 }));
+  const fetchCart = async () => {
+    try {
+      const data = await FireAPI("api/cart", "GET", null, token);
+      const cartData = {};
+      data?.cart?.items.forEach((item) => {
+        cartData[item.product._id] = item.quantity;
+      });
+      setCartItems(cartData);
+      // console.log(cartData);
+    } catch (error) {
+      console.error("Error fetching cart:", error);
+    }
   };
 
-  const removeFromCart = (itemId) => {
-    setCartItems((prev) => {
-      const newCart = { ...prev };
-      if (newCart[itemId] > 0) {
-        newCart[itemId] = newCart[itemId] - 1;
-      }
-      return newCart;
-    });
+  useEffect(() => {
+    if (token) {
+      fetchCart();
+    }
+  }, [token]);
+
+  const addToCart = async (itemId) => {
+    try {
+      await FireAPI("api/cart/add", "POST", { productId: itemId }, token);
+      setCartItems((prev) => ({
+        ...prev,
+        [itemId]: (prev[itemId] || 0) + 1,
+      }));
+    } catch (error) {
+      console.error("Add to cart error:", error);
+    }
   };
 
+  const removeFromCart = async () => {
+    try {
+      await FireAPI("api/cart/remove", "POST", { productId: itemId }, token);
+      setCartItems((prev) => {
+        const newCart = { ...prev };
+        if (newCart[itemId] > 1) {
+          newCart[itemId] -= 1;
+        } else {
+          delete newCart[itemId];
+        }
+        return newCart;
+      });
+    } catch (error) {
+      console.error("Remove error:", error);
+    }
+  };
   const getTotalCartAmount = () => {
     let totalAmount = 0;
     for (const itemId in cartItems) {

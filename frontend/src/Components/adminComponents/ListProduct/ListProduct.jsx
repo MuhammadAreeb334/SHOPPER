@@ -37,7 +37,7 @@ const ListProduct = () => {
         } else {
           toast.error("Failed to fetch Product");
         }
-        console.log(data);
+        // console.log(data);
       } catch (error) {
         console.error("Error fetching products:", error);
         toast.error("Error loading products");
@@ -52,7 +52,8 @@ const ListProduct = () => {
   const handleDelete = async (productId, productName) => {
     if (window.confirm(`Are you sure you want to delete "${productName}"?`)) {
       try {
-        await FireAPI(`api/products/${productId}`, "DELETE");
+        const token = localStorage.getItem("token");
+        await FireAPI(`api/products/${productId}`, "DELETE", null, token);
         setProducts(products.filter((product) => product._id !== productId));
         toast.success(`${productName} deleted successfully!`);
       } catch (error) {

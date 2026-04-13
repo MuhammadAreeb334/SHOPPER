@@ -25,7 +25,7 @@ const EditProduct = () => {
       setLoading(true);
       try {
         const data = await FireAPI(`api/products/${id}`, "GET");
-        console.log(data);
+        // console.log(data);
         if (data && data.success) {
           const product = data.product;
           setProductDetails({
@@ -122,20 +122,26 @@ const EditProduct = () => {
       images.forEach((image, index) => {
         formData.append("images", image);
       });
-
-      const response = await FireAPI(`api/products/${id}`, "PATCH", formData);
+      // console.log(localStorage.getItem("token"))
+      const token = localStorage.getItem("token");
+      const response = await FireAPI(
+        `api/products/${id}`,
+        "PATCH",
+        formData,
+        token,
+      );
       if (response.success) {
         toast.success("Product Updated Successfully!");
         navigate("/admin/list-product");
       }
 
-      console.log("Product Updated:", {
-        id,
-        ...productDetails,
-        existingImages,
-        newImages: images.map((img) => img.name),
-        removedImages,
-      });
+      // console.log("Product Updated:", {
+      //   id,
+      //   ...productDetails,
+      //   existingImages,
+      //   newImages: images.map((img) => img.name),
+      //   removedImages,
+      // });
     } catch (error) {
       console.error("Error updating product:", error);
       toast.error("Error updating product. Please try again.");
@@ -151,7 +157,8 @@ const EditProduct = () => {
       )
     ) {
       try {
-        const response = await FireAPI(`api/products/${id}`, "DELETE");
+        const token = localStorage.getItem("token");
+        const response = await FireAPI(`api/products/${id}`, "DELETE", null, token);
         toast.success("Product deleted successfully!");
         navigate("/admin/list-product");
       } catch (error) {

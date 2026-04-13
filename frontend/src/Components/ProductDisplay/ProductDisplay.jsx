@@ -1,6 +1,5 @@
 import React, { useContext, useState } from "react";
 import "./ProductDisplay.css";
-import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 import { ShopContext } from "../../Context/ShopContext";
 import toast from "react-hot-toast";
 
@@ -19,13 +18,20 @@ const ProductDisplay = ({ product }) => {
 
   const images = product.images?.length ? product.images : [product.image];
   const hasDiscount = product.old_price > product.new_price;
-  const discountPercentage = hasDiscount 
-    ? Math.round(((product.old_price - product.new_price) / product.old_price) * 100)
+  const discountPercentage = hasDiscount
+    ? Math.round(
+        ((product.old_price - product.new_price) / product.old_price) * 100,
+      )
     : 0;
 
   const handleAddToCart = () => {
     addToCart(product.id);
-    toast.success(`${product.name} added to cart!`);
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("Please login to add to cart");
+    } else {
+      toast.success(`${product.name} added to cart!`);
+    }
   };
 
   return (
@@ -55,9 +61,7 @@ const ProductDisplay = ({ product }) => {
         <h1>{product.name}</h1>
 
         <div className="product-display-right-prices">
-          {hasDiscount && (
-            <div className="price-old">${product.old_price}</div>
-          )}
+          {hasDiscount && <div className="price-old">${product.old_price}</div>}
           <div className="price-new">${product.new_price}</div>
           {hasDiscount && (
             <div className="price-discount">-{discountPercentage}%</div>

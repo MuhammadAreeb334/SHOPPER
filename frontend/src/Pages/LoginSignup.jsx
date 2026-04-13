@@ -81,7 +81,7 @@ const LoginSignup = () => {
     };
     try {
       const response = await FireAPI(endPoint, "POST", payload);
-      console.log("Auth Success: ", response);
+      // console.log("Auth Success: ", response);
       updateToken(response.token, response.user);
       toast.success(isLogin ? "Logged in successfully" : "Account created");
       if (response.user.role === "admin") {
