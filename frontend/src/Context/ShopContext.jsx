@@ -30,7 +30,7 @@ const ShopContextProvider = (props) => {
     setLoading(true);
     try {
       const data = await FireAPI(`api/products`, "GET");
-      console.log("Fetched products:", data.allProducts);
+      // console.log("Fetched products:", data.allProducts);
 
       if (data && data.success) {
         const productsData = data.allProducts;
