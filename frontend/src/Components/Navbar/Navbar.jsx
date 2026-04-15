@@ -11,11 +11,11 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
 
   const handleLogout = () => {
     updateToken("");
-    // localStorage.removeItem("user");
+    // sessionStorage.removeItem("user");
     navigate("/login");
     // If not using a global Auth state, you might need window.location.reload()
     // to force a UI update across the app.

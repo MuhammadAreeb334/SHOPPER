@@ -52,7 +52,7 @@ const ListProduct = () => {
   const handleDelete = async (productId, productName) => {
     if (window.confirm(`Are you sure you want to delete "${productName}"?`)) {
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         await FireAPI(`api/products/${productId}`, "DELETE", null, token);
         setProducts(products.filter((product) => product._id !== productId));
         toast.success(`${productName} deleted successfully!`);

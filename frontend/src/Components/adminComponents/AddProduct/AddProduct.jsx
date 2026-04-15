@@ -79,7 +79,7 @@ const AddProduct = () => {
       images.forEach((image) => {
         formData.append("images", image);
       });
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const response = await FireAPI("api/products", "POST", formData, token);
       if (response.success) {
         toast.success("Product added successfully!");

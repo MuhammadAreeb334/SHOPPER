@@ -8,19 +8,19 @@ const ShopContextProvider = (props) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [cartItems, setCartItems] = useState({});
-  const [token, setToken] = useState(localStorage.getItem("token") || "");
+  const [token, setToken] = useState(sessionStorage.getItem("token") || "");
   const [user, setUser] = useState(
-    JSON.parse(localStorage.getItem("user")) || null,
+    JSON.parse(sessionStorage.getItem("user")) || null,
   );
   const updateToken = (newToken, userData = null) => {
     if (newToken) {
-      localStorage.setItem("token", newToken);
-      localStorage.setItem("user", JSON.stringify(userData));
+      sessionStorage.setItem("token", newToken);
+      sessionStorage.setItem("user", JSON.stringify(userData));
       setToken(newToken);
       setUser(userData);
     } else {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
+      sessionStorage.removeItem("token");
+      sessionStorage.removeItem("user");
       setToken("");
       setUser(null);
     }
@@ -93,7 +93,7 @@ const ShopContextProvider = (props) => {
     }
   };
 
-  const removeFromCart = async () => {
+  const removeFromCart = async (itemId) => {
     try {
       await FireAPI("api/cart/remove", "POST", { productId: itemId }, token);
       setCartItems((prev) => {

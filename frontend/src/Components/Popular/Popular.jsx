@@ -40,7 +40,7 @@ const Popular = () => {
       <hr />
 
       {loading ? (
-        <div className="loader animate-spin h-12 w-12 border-b-2 border-red-500 mx-auto" />
+        <div className="animate-spin h-10 w-10 border-b-2 border-red-500 rounded-full" />
       ) : (
         <div className="popular_items">
           {popularProducts.length > 0 ? (

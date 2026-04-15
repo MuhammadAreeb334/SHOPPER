@@ -122,8 +122,8 @@ const EditProduct = () => {
       images.forEach((image, index) => {
         formData.append("images", image);
       });
-      // console.log(localStorage.getItem("token"))
-      const token = localStorage.getItem("token");
+      // console.log(sessionStorage.getItem("token"))
+      const token = sessionStorage.getItem("token");
       const response = await FireAPI(
         `api/products/${id}`,
         "PATCH",
@@ -157,7 +157,7 @@ const EditProduct = () => {
       )
     ) {
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         const response = await FireAPI(`api/products/${id}`, "DELETE", null, token);
         toast.success("Product deleted successfully!");
         navigate("/admin/list-product");

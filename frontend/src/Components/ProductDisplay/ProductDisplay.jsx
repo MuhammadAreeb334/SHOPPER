@@ -26,7 +26,7 @@ const ProductDisplay = ({ product }) => {
 
   const handleAddToCart = () => {
     addToCart(product.id);
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (!token) {
       toast.error("Please login to add to cart");
     } else {

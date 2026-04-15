@@ -57,7 +57,8 @@
   font-weight: 500;
   cursor: pointer;
   transition: background 0.3s ease;
-  
+  padding: 0 2rem;
+  height: 100%;
 }
 
 .newsletter__button:hover {

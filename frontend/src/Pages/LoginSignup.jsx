@@ -89,7 +89,7 @@ const LoginSignup = () => {
       } else {
         navigate("/");
       }
-      // localStorage.setItem("user", JSON.stringify(response.user));
+      // sessionStorage.setItem("user", JSON.stringify(response.user));
     } catch (error) {
       console.log(error.message);
     } finally {
